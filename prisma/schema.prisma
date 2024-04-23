@@ -8,13 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
+model Type {
   id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  Int?
+  isCollection     Boolean
+  isSchema   Boolean
+  name Boolean @default(false)
+  tag String?
 }
 
 model Account {
@@ -57,7 +56,6 @@ model User {
   image         String?
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  posts         Post[]
   accounts      Account[]
   sessions      Session[]
 
