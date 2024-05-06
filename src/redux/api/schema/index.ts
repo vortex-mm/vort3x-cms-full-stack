@@ -7,7 +7,7 @@ const initialState = {
     tag: 'product',
     isSchema: true,
     isCollection: false,
-    formList: [
+    forms: [
       {
         name: 'sliders',
         label: 'Sliders',

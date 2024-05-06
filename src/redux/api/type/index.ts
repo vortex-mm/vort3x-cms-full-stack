@@ -1,19 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  // /v1/types
-  // /v1/schemas
-  
-  // schemas (table)
-  // id | name | tag 
-
-  // types (table)
-  // id | name | tag | isCollection | isSchema
-
-  // form_item_blueprints (table)
-  // schema_id or type_id (prefer polymorphic relation) | id | name | label | description | dataType | bluePrint | formControl => { validationRules, initialValues }
-
-  // will fetch from api and store in global storage
   collection: [
     {
       id: 'BannerType',
@@ -21,7 +8,7 @@ const initialState = {
       tag: 'banner',
       isSchema: false,
       isCollection: true,
-      formList: [
+      forms: [
         {
           name: 'banner_name',
           label: 'Banner Name',
@@ -48,7 +35,7 @@ const initialState = {
       tag: 'custom',
       isSchema: false,
       isCollection: true,
-      formList: [
+      forms: [
         {
           name: 'custom_name',
           label: 'Custom Name',
@@ -75,7 +62,7 @@ const initialState = {
       tag: 'slider',
       isSchema: false,
       isCollection: false,
-      formList: [
+      forms: [
         {
           name: 'title',
           label: 'Title',
@@ -115,10 +102,13 @@ const typeSlice = createSlice({
   reducers: {
     setActiveId(state, action) {
       state.activeId = action.payload
+    },
+    updateTypeCollection(state, action) {
+      state.collection = action.payload
     }
   }
 })
 
-export const { setActiveId } = typeSlice.actions
+export const { setActiveId, updateTypeCollection } = typeSlice.actions
 
 export default typeSlice.reducer

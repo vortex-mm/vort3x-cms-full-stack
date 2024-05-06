@@ -8,12 +8,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Form {
+  id        Int     @id @default(autoincrement())
+  name     String
+  label String
+  description String?
+  dataType String
+  initialValues String?
+  bluePrint String
+  validationRules String[]
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  
+  type Type @relation(fields: [typeId], references: [id])
+  typeId             Int     @map("form_id")
+
+  @@map("forms")
+}
+
+
 model Type {
   id        Int     @id @default(autoincrement())
+  name String
+  tag String
   isCollection     Boolean
   isSchema   Boolean
-  name Boolean @default(false)
-  tag String?
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  forms Form[]
+
+  @@map("types")
 }
 
 model Account {

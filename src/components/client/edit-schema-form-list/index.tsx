@@ -53,7 +53,7 @@ const SchemaFormList = () => {
     <div className="container">
       <form onSubmit={form.onSubmit(values => dispatch(updateContent(values)))}>
         {Object.entries(form.values).map(([formName, formValue], index) => {
-          const formItem = schema.formList.find(formItem => formItem.name === formName) || schema.formList[0]
+          const formItem = schema.forms.find(formItem => formItem.name === formName) || schema.forms[0]
           if (!primitiveDataTypes.includes(formItem.dataType)) {
             if (Array.isArray(formValue)) {
               return (

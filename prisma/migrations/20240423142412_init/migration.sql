@@ -1,12 +1,31 @@
 -- CreateTable
-CREATE TABLE "Type" (
+CREATE TABLE "forms" (
     "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "description" TEXT,
+    "dataType" TEXT NOT NULL,
+    "initialValues" TEXT,
+    "bluePrint" TEXT NOT NULL,
+    "validationRules" TEXT[],
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "form_id" INTEGER NOT NULL,
+
+    CONSTRAINT "forms_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "types" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "tag" TEXT NOT NULL,
     "isCollection" BOOLEAN NOT NULL,
     "isSchema" BOOLEAN NOT NULL,
-    "name" BOOLEAN NOT NULL DEFAULT false,
-    "tag" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Type_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "types_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -73,6 +92,9 @@ CREATE UNIQUE INDEX "verificationtokens_token_key" ON "verificationtokens"("toke
 
 -- CreateIndex
 CREATE UNIQUE INDEX "verificationtokens_identifier_token_key" ON "verificationtokens"("identifier", "token");
+
+-- AddForeignKey
+ALTER TABLE "forms" ADD CONSTRAINT "forms_form_id_fkey" FOREIGN KEY ("form_id") REFERENCES "types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

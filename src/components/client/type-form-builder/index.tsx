@@ -3,7 +3,9 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import FormInputBuilder from '@client-components/form-input-builder'
 
-type FormItem = {
+export type TypeFormObj = { [key: string]: string }
+
+export type FormItem = {
   name: string
   label: string
   description: string
@@ -15,22 +17,29 @@ type FormItem = {
 
 const TypeFormBuilder = ({
   form,
-  formItem,
   formValue,
+  formType,
   formItemName
 }: {
   form: UseFormReturnType<object, (values: object) => object>
-  formItem: FormItem
-  formValue: FormItem
-  formItemName: string
+  formValue: TypeFormObj
+  formType: string
+  formItemName?: string
 }) => {
-  const typeCollection = useSelector((state: RootState) => state.type.collection)
+  const type = useSelector((state: RootState) => state.type.collection.find(item => item.tag === formType))
 
-  const type = typeCollection.find(repo => repo.id === formItem.dataType) || typeCollection[0]
+  if (!type) {
+    return <h1>Collection have not found your type</h1>
+  }
 
   const extraProps = (componentType: string) => {
     const props = new Map([
-      ['TextInput', {}],
+      [
+        'TextInput',
+        {
+          wrapperClassName: 'form-text-input'
+        }
+      ],
       [
         'Select',
         {
@@ -42,18 +51,24 @@ const TypeFormBuilder = ({
     return props.get(componentType)
   }
 
+  const getFormItem = (name: string) => {
+    return type.forms.find(formItem => formItem.name === name) || type.forms[0]
+  }
+
+  const formItemKeys = formValue ? Object.keys(formValue): []
+
+  const formItems = formItemKeys.map(formItemKey => getFormItem(formItemKey))
   return (
     <>
-      {Object.entries(formValue).map(([subFormName], indx) => {
-        const subFormItem = type.formList.find(formItem => formItem.name === subFormName) || type.formList[0]
-        const formName = `${formItemName}.${subFormItem.name}`
+      {formItems.map((formItem, indx) => {
+        const formName = `${formItemName}.${formItem.name}`
         return (
           <FormInputBuilder
             key={`form-sub-item-${indx}`}
-            formItem={subFormItem}
+            formItem={formItem}
             formProps={{
               ...form.getInputProps(formName),
-              ...extraProps(subFormItem.bluePrint)
+              ...extraProps(formItem.bluePrint)
             }}
           />
         )

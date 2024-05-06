@@ -1,0 +1,11 @@
+.page-layout-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.page-layout-content {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}

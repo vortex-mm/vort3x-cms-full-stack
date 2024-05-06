@@ -9,7 +9,6 @@ const contentSlice = createSlice({
   initialState,
   reducers: {
     updateContent(state, action) {
-      console.log({payload: action.payload})
       state.data = action.payload
     }
   }

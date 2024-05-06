@@ -1,7 +1,9 @@
 import InputRegistery from '@client-components/input-registery'
 import { SelectProps, TextInputProps } from '@mantine/core'
 
-type FormInputProps = TextInputProps & SelectProps
+type FormInputProps = TextInputProps & SelectProps & {
+  wrapperClassName?: string
+}
 
 interface FormInputBuilderProps {
   name: string
@@ -10,17 +12,21 @@ interface FormInputBuilderProps {
   dataType: string
   bluePrint: string
   validationRules: string[]
+  initialValues?: string
 }
 
 type InputBluePrint = keyof typeof InputRegistery
 
 const FormInputBuilder = ({ formItem, formProps }: { formItem: FormInputBuilderProps; formProps: FormInputProps }) => {
   const { bluePrint, label, description } = formItem
+  const { wrapperClassName, ...remainFormProps } = formProps
 
   if (bluePrint in InputRegistery) {
     const FormInput = InputRegistery[bluePrint as InputBluePrint]
     return (
-      <FormInput label={label} placeholder={description} {...formProps} />
+      <div className={wrapperClassName}>
+        <FormInput label={label} placeholder={description} {...remainFormProps} />
+      </div>
     )
   }
 
