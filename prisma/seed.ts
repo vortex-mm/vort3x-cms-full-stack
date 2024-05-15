@@ -40,9 +40,18 @@ const typeData = [
           description: 'To store the banner',
           dataType: 'String',
           initialValues: '',
-          bluePrint: 'TextInput',
+          bluePrint: 'RichTextInput',
           validationRules: ['required']
-        }
+        },
+        {
+          name: 'banner_types',
+          label: 'Banner Types',
+          description: 'To store the banner type',
+          dataType: 'String',
+          initialValues: 'React',
+          bluePrint: 'Select',
+          validationRules: ['required']
+        },
       ]
     }
   },

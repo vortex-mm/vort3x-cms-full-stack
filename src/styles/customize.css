@@ -1,4 +1,5 @@
-@import url("page-layout.css");
+@import url("./page-layout.css");
+@import url("./form-layout.css");
 
 body {
   background-color: #FFF1E5;

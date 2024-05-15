@@ -56,12 +56,16 @@ const SchemaFormList = ({ collection }: { collection: TypesServerProps[] }) => {
     dispatch(updateTypeCollection(collection))
   }, [collection, dispatch])
 
+  const collectionTabs = collection.map(item => ({ tag: item.tag, name: item.name }))
+
   type TypeFormEntries = [string, Array<TypeFormObj> | TypeFormObj][]
   const formEntries: TypeFormEntries = Object.entries(form.values)
 
-  const [tab, setTab] = useState('SliderType')
+  const [tab, setTab] = useState(collectionTabs[0].tag)
+  console.log({formEntries})
 
   const activeTabIndex = formEntries.findIndex(([formType]) => formType === tab)
+  console.log({activeTabIndex})
   const [formType, formValue] = formEntries[activeTabIndex]
   const isFormValueCollection = Array.isArray(formValue)
 
@@ -81,11 +85,11 @@ const SchemaFormList = ({ collection }: { collection: TypesServerProps[] }) => {
         <div className="form-container">
           <div className="form-list">
             <ul>
-              <li className={isActiveTab('SliderType')} onClick={() => handleTabChange('SliderType')}>
-                General
-              </li>
-              <li className={isActiveTab('BannerType')} onClick={() => handleTabChange('BannerType')}>Banner Type</li>
-              <li className={isActiveTab('CustomType')} onClick={() => handleTabChange('CustomType')}>Custom Type</li>
+              {collectionTabs.map((tab, index) => 
+                <li className={isActiveTab(tab.tag)} key={`tab-${index}`} onClick={() => handleTabChange(tab.tag)}>
+                  {tab.name}
+                </li>
+              )}
             </ul>
           </div>
           <form onSubmit={form.onSubmit(values => console.log({ values }))}>
@@ -95,7 +99,9 @@ const SchemaFormList = ({ collection }: { collection: TypesServerProps[] }) => {
               ) : (
                 <TypeFormBuilder form={form} formValue={formValue} formType={formType} formItemName={formType} />
               )}
-              <Button color="green" type="submit">
+            </div>
+            <div className="form-btn-submit">
+              <Button type="submit">
                 Submit
               </Button>
             </div>

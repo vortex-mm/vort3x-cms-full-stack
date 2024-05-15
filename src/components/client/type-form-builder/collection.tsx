@@ -1,7 +1,7 @@
 import { UseFormReturnType } from '@mantine/form'
-import { Button } from '@mantine/core'
 import TypeFormBuilder, { type TypeFormObj } from '.'
 import { useCallback, useEffect, useState } from 'react'
+import { MdFormatListBulletedAdd } from "react-icons/md";
 
 const TypeFormCollectionBuilder = ({
   form,
@@ -27,8 +27,11 @@ const TypeFormCollectionBuilder = ({
   const formSubValueIndex = formValue.findIndex((_formSubValue, i) => getFormItemName(i) === tab) || 0
   return (
     <div className="form-collection">
-      <div className="form-list">
+      <div className="form-list vertical">
         <ul>
+          <li className="form-add" onClick={() => form.insertListItem(formType, formValue[0])}>
+            <MdFormatListBulletedAdd />
+          </li>
           {formValue.map((_formSubValue, i) => (
             <li
               key={`form-sub-list-${i}`}
@@ -40,27 +43,14 @@ const TypeFormCollectionBuilder = ({
           ))}
         </ul>
       </div>
-      <div>
+      <div className="form-panel">
         <TypeFormBuilder
           form={form}
           formValue={formValue[formSubValueIndex]}
           formType={formType}
           formItemName={getFormItemName(formSubValueIndex)}
         />
-        <Button onClick={() => form.insertListItem(formType, formValue[0])}>Add {formType}</Button>
       </div>
-      {/* <Drawer opened={opened} onClose={close} title="Authentication">
-        {formValue.map((formSubValue, i) => (
-          <ul key={`form-collection-list-${i}`}>
-            <TypeFormBuilder
-              form={form}
-              formValue={formSubValue}
-              formType={formType}
-              formItemName={`${formType}.${i}`}
-            />
-          </ul>
-        ))}
-      </Drawer> */}
     </div>
   )
 }
