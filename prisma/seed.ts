@@ -113,6 +113,61 @@ const typeData = [
   }
 ]
 
+
+const contentData = [
+  {
+    typeName: "banner_type",
+    contents: [
+      {
+        banner_name: "",
+        banner_description: "",
+        banner_types: "React"
+      },
+      {
+        banner_name: "",
+        banner_description: "",
+        banner_types: "React"
+      },
+      {
+        banner_name: "",
+        banner_description: "",
+        banner_types: "React"
+      }
+    ]
+  },
+  {
+    typeName: "custom_type",
+    contents: [
+      {
+        custom_name: "test",
+        custom_description: "React"
+      }
+    ]
+  },
+  {
+    typeName: "slider_type",
+    contents: [
+      {
+        slider_title: "",
+        slider_content: ""
+      }
+    ]
+  }
+];
+
+async function upsertContent(typeName: string, contentValue: object, index: number) {
+  const type = await prisma.type.findFirst({ where: { tag: typeName } });
+  if (type) {
+    await prisma.content.create({
+      data: {
+        value: contentValue,
+        typeId: type.id,
+        index
+      }
+    });
+  }
+}
+
 async function main() {
   console.log(`Start seeding ...`)
   for (const u of userData) {
@@ -126,7 +181,16 @@ async function main() {
     const type = await prisma.type.create({
       data: t
     })
-    console.log(`Created user with id: ${type.id}`)
+    console.log(`Created type with id: ${type.id}`)
+  }
+
+  for (const item of contentData) {
+    const typeName = item.typeName;
+    const contents = item.contents;
+    
+    contents.map(async (content, index) => {
+      await upsertContent(typeName, content, index);
+    })
   }
   console.log(`Seeding finished.`)
 }

@@ -1,4 +1,17 @@
 -- CreateTable
+CREATE TABLE "types" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "tag" TEXT NOT NULL,
+    "isCollection" BOOLEAN NOT NULL,
+    "isSchema" BOOLEAN NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "types_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "forms" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
@@ -16,16 +29,15 @@ CREATE TABLE "forms" (
 );
 
 -- CreateTable
-CREATE TABLE "types" (
+CREATE TABLE "contents" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "tag" TEXT NOT NULL,
-    "isCollection" BOOLEAN NOT NULL,
-    "isSchema" BOOLEAN NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
+    "index" INTEGER NOT NULL,
+    "value" JSONB NOT NULL,
+    "typeId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "types_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "contents_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -79,6 +91,9 @@ CREATE TABLE "verificationtokens" (
 );
 
 -- CreateIndex
+CREATE INDEX "contents_typeId_idx" ON "contents"("typeId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "accounts_provider_provider_account_id_key" ON "accounts"("provider", "provider_account_id");
 
 -- CreateIndex
@@ -95,6 +110,9 @@ CREATE UNIQUE INDEX "verificationtokens_identifier_token_key" ON "verificationto
 
 -- AddForeignKey
 ALTER TABLE "forms" ADD CONSTRAINT "forms_form_id_fkey" FOREIGN KEY ("form_id") REFERENCES "types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "contents" ADD CONSTRAINT "contents_typeId_fkey" FOREIGN KEY ("typeId") REFERENCES "types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

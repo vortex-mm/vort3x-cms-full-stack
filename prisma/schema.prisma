@@ -8,36 +8,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Type {
+  id             Int        @id @default(autoincrement())
+  name           String
+  tag            String
+  isCollection   Boolean
+  isSchema       Boolean
+  createdAt      DateTime   @default(now()) @map(name: "created_at")
+  updatedAt      DateTime   @updatedAt @map(name: "updated_at")
+  forms          Form[]
+  contents       Content[]
+
+  @@map("types")
+}
+
 model Form {
-  id        Int     @id @default(autoincrement())
-  name     String
-  label String
-  description String?
-  dataType String
-  initialValues String?
-  bluePrint String
+  id             Int        @id @default(autoincrement())
+  name           String
+  label          String
+  description    String?
+  dataType       String
+  initialValues  String?
+  bluePrint      String
   validationRules String[]
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  
-  type Type @relation(fields: [typeId], references: [id])
-  typeId             Int     @map("form_id")
+  createdAt      DateTime   @default(now()) @map(name: "created_at")
+  updatedAt      DateTime   @updatedAt @map(name: "updated_at")
+  typeId         Int        @map("form_id")
+  type           Type       @relation(fields: [typeId], references: [id])
 
   @@map("forms")
 }
 
 
-model Type {
-  id        Int     @id @default(autoincrement())
-  name String
-  tag String
-  isCollection     Boolean
-  isSchema   Boolean
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  forms Form[]
+model Content {
+  id             Int        @id @default(autoincrement())
+  index          Int
+  value          Json
+  typeId         Int
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  type           Type       @relation(fields: [typeId], references: [id])
 
-  @@map("types")
+  @@map("contents")
+  @@index([typeId])
 }
 
 model Account {

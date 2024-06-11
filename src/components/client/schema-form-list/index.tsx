@@ -3,9 +3,8 @@
 import { useForm } from '@mantine/form'
 import { Button } from '@mantine/core'
 import TypeFormBuilder, { TypeFormObj } from '@client-components/type-form-builder'
-import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '@/redux/store'
-import { TypesServerProps } from '~/src/app/form/page'
+import { useDispatch } from 'react-redux'
+import { ContentServerProps, TypesServerProps } from '~/src/app/form/page'
 import { useEffect, useState } from 'react'
 import { updateTypeCollection } from '~/src/redux/api/type'
 import TypeFormCollectionBuilder from '../type-form-builder/collection'
@@ -20,8 +19,7 @@ type FormItem = {
   validationRules: string[]
 }
 
-const SchemaFormList = ({ collection }: { collection: TypesServerProps[] }) => {
-  const content = useSelector((state: RootState) => state.content.data)
+const SchemaFormList = ({ collection, initialContent }: { collection: TypesServerProps[], initialContent: ContentServerProps }) => {
 
   function isEmpty(obj: object) {
     return Object.keys(obj).length === 0
@@ -35,7 +33,7 @@ const SchemaFormList = ({ collection }: { collection: TypesServerProps[] }) => {
       }
     }, {})
 
-  const initialValues = isEmpty(content)
+  const initialValues = isEmpty(initialContent)
     ? collection.reduce((combineFormItem, formItem) => {
         return {
           ...combineFormItem,
@@ -44,7 +42,7 @@ const SchemaFormList = ({ collection }: { collection: TypesServerProps[] }) => {
             : generateFormObject(formItem.forms)
         }
       }, {})
-    : content
+    : initialContent
 
   const form = useForm({
     initialValues
@@ -62,10 +60,8 @@ const SchemaFormList = ({ collection }: { collection: TypesServerProps[] }) => {
   const formEntries: TypeFormEntries = Object.entries(form.values)
 
   const [tab, setTab] = useState(collectionTabs[0].tag)
-  console.log({formEntries})
 
   const activeTabIndex = formEntries.findIndex(([formType]) => formType === tab)
-  console.log({activeTabIndex})
   const [formType, formValue] = formEntries[activeTabIndex]
   const isFormValueCollection = Array.isArray(formValue)
 

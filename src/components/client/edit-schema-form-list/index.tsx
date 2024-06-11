@@ -1,13 +1,14 @@
-"use client"
+'use client'
 
 import { useForm } from '@mantine/form'
-import { Button, Drawer } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
-import FormInputBuilder from '@client-components/form-input-builder'
-import TypeFormBuilder from '@client-components/type-form-builder'
+import { Button } from '@mantine/core'
+import TypeFormBuilder, { TypeFormObj } from '@client-components/type-form-builder'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '@/redux/store'
-import { updateContent } from "@/redux/api/content";
+import { TypesServerProps } from '~/src/app/form/page'
+import { useEffect, useState } from 'react'
+import { updateTypeCollection } from '~/src/redux/api/type'
+import TypeFormCollectionBuilder from '../type-form-builder/collection'
 
 type FormItem = {
   name: string
@@ -19,92 +20,94 @@ type FormItem = {
   validationRules: string[]
 }
 
-const SchemaFormList = () => {
-  const primitiveDataTypes = ['String', 'Boolean', 'Number']
-  const schema = useSelector((state: RootState) => state.schema.data)
-
+const EditSchemaFormList = ({ collection }: { collection: TypesServerProps[] }) => {
   const content = useSelector((state: RootState) => state.content.data)
 
-  const initialValues = content
+  function isEmpty(obj: object) {
+    return Object.keys(obj).length === 0
+  }
+
+  const generateFormObject = (forms: FormItem[]) =>
+    forms.reduce((combineFormItem, formItem) => {
+      return {
+        ...combineFormItem,
+        [formItem.name]: formItem.initialValues
+      }
+    }, {})
+
+  const initialValues = isEmpty(content)
+    ? collection.reduce((combineFormItem, formItem) => {
+        return {
+          ...combineFormItem,
+          [formItem.tag]: formItem.isCollection
+            ? [generateFormObject(formItem.forms)]
+            : generateFormObject(formItem.forms)
+        }
+      }, {})
+    : content
 
   const form = useForm({
     initialValues
   })
 
-  const extraProps = (componentType: string) => {
-    const props = new Map([
-      ['TextInput', {}],
-      [
-        'Select',
-        {
-          clearable: true,
-          data: ['React', 'Angular']
-        }
-      ]
-    ])
-    return props.get(componentType)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(updateTypeCollection(collection))
+  }, [collection, dispatch])
+
+  const collectionTabs = collection.map(item => ({ tag: item.tag, name: item.name }))
+
+  type TypeFormEntries = [string, Array<TypeFormObj> | TypeFormObj][]
+  const formEntries: TypeFormEntries = Object.entries(form.values)
+
+  const [tab, setTab] = useState(collectionTabs[0].tag)
+
+  const activeTabIndex = formEntries.findIndex(([formType]) => formType === tab)
+  const [formType, formValue] = formEntries[activeTabIndex]
+  const isFormValueCollection = Array.isArray(formValue)
+
+  const handleTabChange = (tab: string) => {
+    setTab(tab)
   }
 
-  const [opened, { open, close }] = useDisclosure(false)
-
-  const dispatch = useDispatch();
+  const isActiveTab = (name: string) => (name === tab ? 'active' : '')
 
   return (
-    <div className="container">
-      <form onSubmit={form.onSubmit(values => dispatch(updateContent(values)))}>
-        {Object.entries(form.values).map(([formName, formValue], index) => {
-          const formItem = schema.forms.find(formItem => formItem.name === formName) || schema.forms[0]
-          if (!primitiveDataTypes.includes(formItem.dataType)) {
-            if (Array.isArray(formValue)) {
-              return (
-                <div key={`form-item-${index}`}>
-                  <Button onClick={open}>Extra Fields {formName}</Button>
-                  <Drawer opened={opened} onClose={close} title="Authentication">
-                    {formValue.map((formSubValue, i) => (
-                      <ul key={`form-collection-list-${i}`}>
-                        <TypeFormBuilder
-                          form={form}
-                          formValue={formSubValue as FormItem}
-                          formItem={formItem}
-                          formItemName={`${formItem.name}.${i}`}
-                        />
-                      </ul>
-                    ))}
-                    <Button onClick={() => form.insertListItem(formName, formValue[0])}>Add {formName}</Button>
-                  </Drawer>
-                </div>
-              )
-            } else {
-              return (
-                <div key={`form-item-${index}`}>
-                  <TypeFormBuilder
-                    form={form}
-                    formValue={formValue as FormItem}
-                    formItem={formItem}
-                    formItemName={formItem.name}
-                  />
-                </div>
-              )
-            }
-          } else {
-            return (
-              <FormInputBuilder
-                key={`form-item-${index}`}
-                formItem={formItem}
-                formProps={{
-                  ...form.getInputProps(formName),
-                  ...extraProps(formItem.bluePrint)
-                }}
-              />
-            )
-          }
-        })}
-        <Button color="green" type="submit">
-          Submit
-        </Button>
-      </form>
+    <div className="form-page-container">
+      <div className="container">
+        <div className="title">
+          <h1>Update Content</h1>
+          <h2>Manage your content and upload to your database.</h2>
+        </div>
+        <div className="form-container">
+          <div className="form-list">
+            <ul>
+              {collectionTabs.map((tab, index) => 
+                <li className={isActiveTab(tab.tag)} key={`tab-${index}`} onClick={() => handleTabChange(tab.tag)}>
+                  {tab.name}
+                </li>
+              )}
+            </ul>
+          </div>
+          <form onSubmit={form.onSubmit(values => console.log({ values }))}>
+            <div className="form-panel">
+              {isFormValueCollection ? (
+                <TypeFormCollectionBuilder form={form} formValue={formValue} formType={formType} />
+              ) : (
+                <TypeFormBuilder form={form} formValue={formValue} formType={formType} formItemName={formType} />
+              )}
+            </div>
+            <div className="form-btn-submit">
+              <Button type="submit">
+                Submit
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   )
 }
 
-export default SchemaFormList
+export default EditSchemaFormList
